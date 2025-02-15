@@ -1,0 +1,22 @@
+{
+    "name": "hjsleijster/pingpongeriser",
+    "description": "Pingpongeriser | Literiser",
+    "type": "project",
+    "license": "GNU",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Henk-Jan Sleijster",
+            "email": "henk-jan@sibi.nl"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:hjsleijster/literiser.git"
+        }
+    ],
+    "require": {
+        "hjsleijster/literiser": "dev-main"
+    }
+}

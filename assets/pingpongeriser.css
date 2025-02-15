@@ -1,0 +1,28 @@
+.match {
+	display: grid;
+	gap: 4px;
+	grid-template-columns: 1fr 1fr;
+	height: calc(100vh - 2 * 30px);
+
+	.matchside {
+		padding: 70px;
+		background-color: var(--main-color);
+
+		&.side1:not(.switched), &.switched + .matchside  {
+			text-align: right;
+		}
+
+		&.switched {
+			order: 1;
+		}
+
+		h1 {
+			font-size: 240px;
+			padding-right: 50px;
+		}
+
+		h2 {
+			font-size: 100px;
+		}
+	}
+}

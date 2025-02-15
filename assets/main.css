@@ -1,0 +1,19 @@
+:root {
+	--main-color: #46a07e;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+html, body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	border: 30px solid white;
+	font-family: Ubuntu;
+	color: white;
+}
