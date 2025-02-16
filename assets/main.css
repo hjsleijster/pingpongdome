@@ -1,5 +1,5 @@
 :root {
-	--main-color: #46a07e;
+	--ttgreen: #46a07e;
 }
 
 * {
@@ -14,6 +14,6 @@ html, body {
 body {
 	margin: 0;
 	border: 30px solid white;
-	font-family: Ubuntu;
+	font-family: 'Ubuntu';
 	color: white;
 }
