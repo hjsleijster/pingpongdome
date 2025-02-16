@@ -2,7 +2,7 @@
 
 use LiteriserDB as DB;
 
-class Pingpongeriser
+class Pingpongdome
 {
 	use LiteriserModule;
 

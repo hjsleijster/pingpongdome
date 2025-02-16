@@ -1,4 +1,4 @@
-var moduleUrl = '/pingpongeriser/';
+var moduleUrl = '/pingpongdome/';
 
 $(function() {
 	if ($('.match').data('match')) {
