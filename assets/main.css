@@ -1,5 +1,6 @@
 :root {
 	--ttgreen: #46a07e;
+	--ttorange: orange;
 }
 
 * {
@@ -14,6 +15,9 @@ html, body {
 body {
 	margin: 0;
 	border: 30px solid white;
-	font-family: 'Ubuntu';
 	color: white;
+}
+body, input, select {
+	font-family: 'Ubuntu';
+	font-size: 18px;
 }
