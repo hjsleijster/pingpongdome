@@ -22,26 +22,19 @@ $(function() {
 	});
 
 	$('#toggle-options').on('click', function() {
-		$('.options').toggleClass('open');
-
-		if ($('.options').hasClass('open')) {
-			if (matchId) {
-				$('.edit-match').show();
-				$('.new-match').hide();
-			} else {
-				$('.edit-match').hide();
-				$('.new-match').show();
-			}
-		}
+		toggleOptions();
 	});
 
 	$('form').on('submit', function(e) {
 		e.preventDefault();
-		let endpoint = matchId ? 'updateMatch' : 'newMatch';
-		$.post(moduleUrl + endpoint, $(this).serializeArray(), function(data) {
+		let endpoint = matchId ? 'updateMatch/' + matchId : 'newMatch';
+		let data = $(this).serializeArray();
+		$.post(moduleUrl + endpoint, data , function(data) {
+			if (!matchId) {
+				window.history.pushState('', '', '?match=' + data.match.id);
+			}
 			updateMatch(data);
 			$('.options').removeClass('open');
-			window.history.pushState('', '', '?match=' + data.match.id);
 		});
 	})
 
@@ -84,8 +77,24 @@ function updateMatch(data) {
 	$('.side2 .points').text(state.side2.points);
 	$('.side2 .games').text(state.side2.games);
 
-	$('.score-undo').toggle(state.side1.points + state.side1.games + state.side2.points + state.side2.games > 0);
 	$('.match-action').toggle(!data.match.finished_at);
+	$('#score-undo').toggle(0 != state.side1.points + state.side1.games + state.side2.points + state.side2.games);
 
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
+}
+
+function toggleOptions() {
+	$('.options').toggleClass('open');
+
+	if ($('.options').hasClass('open')) {
+		if (matchId) {
+			$('select[name^="player-side"]').attr('required', false);
+			$('.edit-match').show();
+			$('.new-match').hide();
+		} else {
+			$('select[name^="player-side"]').attr('required', true);
+			$('.edit-match').hide();
+			$('.new-match').show();
+		}
+	}
 }

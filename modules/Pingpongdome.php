@@ -13,8 +13,8 @@ class Pingpongdome
 
 		if (isset($_GET['debug'])) {
 			header('Content-type: text/plain');
-			// self::recalculateMatch($this->match_id);
-			$data = self::getMatchData($this->match_id);
+			// self::recalculateMatch();
+			$data = self::getMatchData();
 			echo '<pre>' . print_r($data, true) . '</pre>';
 			exit;
 		}
@@ -48,7 +48,10 @@ class Pingpongdome
 		$r .= '<div class="options">';
 
 		$r .= '<form>';
-		$r .= '<label>Best out of: <label><input type="radio" name="best_out_of" value="3" required> 3</label><input type="radio" name="best_out_of" value="5" required> 5</label></label>';
+		$r .= '<label>Best out of: ';
+		$r .= '<label><input type="radio" name="best_out_of" value="3" required> 3</label>';
+		$r .= '<label><input type="radio" name="best_out_of" value="5" required> 5</label>';
+		$r .= '</label>';
 
 		$r .= '<label class="new-match">Speler 1: ' . $selectName(1) . '</label>';
 		$r .= '<label class="new-match">Speler 2: ' . $selectName(2) . '</label>';
@@ -90,7 +93,9 @@ class Pingpongdome
 		return $r;
 	}
 
-	private function getMatchData($match_id) {
+	private function getMatchData($match_id = null) {
+		$match_id = $match_id ?? $this->match_id;
+
 		$data = [
 			'match' => DB::row("
 				SELECT m.*, IFNULL(SUM(g.won_by_side = 1), 0) `side1_games`, IFNULL(SUM(g.won_by_side = 2), 0) `side2_games`
@@ -118,50 +123,54 @@ class Pingpongdome
 		return $data;
 	}
 
-	private function xhr_newMatch($request) {
-		$match_id = DB::q("INSERT INTO matches (best_out_of) VALUES (" . (int) $request['best_out_of'] . ")");
-		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $match_id . ", " . (int) $request['player-side1'] . ", 1)");
-		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $match_id . ", " . (int) $request['player-side2'] . ", 2)");
-		DB::q("INSERT INTO games (match_id, game) VALUES (" . $match_id . ", 1)");
+	private function xhr_newMatch() {
+		$this->match_id = DB::q("INSERT INTO matches (best_out_of) VALUES (" . (int) $this->request['best_out_of'] . ")");
+		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side1'] . ", 1)");
+		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side2'] . ", 2)");
+		DB::q("INSERT INTO games (match_id, game) VALUES (" . $this->match_id . ", 1)");
 
-		return $this->xhr_getMatch(['match' => $match_id]);
+		return $this->xhr_getMatch();
 	}
 
-	private function xhr_updateMatch($request) {
-		echo '<pre>' . print_r($request, true) . '</pre>';
+	private function xhr_updateMatch($args) {
+		$this->match_id = (int) $args[0];
+		DB::q("UPDATE matches SET best_out_of = " . (int) $this->request['best_out_of'] . " WHERE id = " . $this->match_id);
+
+		return $this->xhr_getMatch();
 	}
 
-	private function xhr_endMatch($request) {
-		DB::q("UPDATE matches SET deleted_at = NOW() WHERE id = " . (int) $request['match']);
+	private function xhr_endMatch() {
+		DB::q("UPDATE matches SET deleted_at = NOW() WHERE id = " . (int) $this->request['match']);
 	}
 
-	private function xhr_scorePlus($request) {
-		$match_id = (int) $request['match'];
-		$side = (int) $request['side'];
+	private function xhr_scorePlus() {
+		$this->match_id = (int) $this->request['match'];
+		$side = (int) $this->request['side'];
 
-		$game = DB::val("SELECT game FROM games WHERE won_by_side IS NULL AND match_id = " . $match_id);
-		DB::q("INSERT INTO points (match_id, game, side) VALUES (" . $match_id . ", " . $game . ", " . $side . ")");
+		$game = DB::val("SELECT game FROM games WHERE won_by_side IS NULL AND match_id = " . $this->match_id);
+		DB::q("INSERT INTO points (match_id, game, side) VALUES (" . $this->match_id . ", " . $game . ", " . $side . ")");
 
-		$this->recalculateMatch($match_id);
-		return $this->xhr_getMatch(['match' => $match_id]);
+		$this->recalculateMatch();
+		return $this->xhr_getMatch();
 	}
 
-	private function xhr_scoreUndo($request) {
-		$match_id = (int) $request['match'];
-		DB::q("DELETE FROM points WHERE match_id = " . $match_id . " ORDER BY id DESC LIMIT 1");
-		$data = self::getMatchData($match_id);
+	private function xhr_scoreUndo() {
+		$this->match_id = (int) $this->request['match'];
+		DB::q("DELETE FROM points WHERE match_id = " . $this->match_id . " ORDER BY id DESC LIMIT 1");
+		$data = self::getMatchData();
 		$lastGame = end($data['games']);
 		if ($lastGame['side1_points'] == 0 && $lastGame['side2_points'] == 0 && count($data['games']) > 1) {
-			DB::q("DELETE FROM games WHERE match_id = " . $match_id . " AND game = " . $lastGame['game']);
-			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $match_id . " AND game = " . ($lastGame['game'] - 1));
+			DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
+			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . ($lastGame['game'] - 1));
 		}
 
-		$this->recalculateMatch($match_id);
-		return $this->xhr_getMatch(['match' => $match_id]);
+		$this->recalculateMatch();
+		return $this->xhr_getMatch();
 	}
 
-	private function xhr_getMatch($request) {
-		$data = self::getMatchData($request['match']);
+	private function xhr_getMatch() {
+		$this->match_id = (int) $this->request['match'];
+		$data = self::getMatchData();
 
 		$r = [];
 		$r['match'] = $data['match'];
@@ -183,7 +192,9 @@ class Pingpongdome
 		return $r;
 	}
 
-	private function recalculateMatch($match_id) {
+	private function recalculateMatch($match_id = null) {
+		$match_id = $match_id ?? $this->match_id;
+
 		$data = self::getMatchData($match_id);
 		$lastGame = end($data['games']);
 		$side1points = $lastGame['side1_points'];
