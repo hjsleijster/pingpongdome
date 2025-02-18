@@ -153,6 +153,11 @@
 			margin-left: 15px;
 			padding: 10px;
 		}
+
+		.error {
+			margin: 10px 0;
+			color: var(--ttred);
+		}
 	}
 
 	#end-match {

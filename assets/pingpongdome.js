@@ -27,12 +27,20 @@ $(function() {
 
 	$('form').on('submit', function(e) {
 		e.preventDefault();
+		let form = this;
 		let endpoint = matchId ? 'updateMatch/' + matchId : 'newMatch';
 		let data = $(this).serializeArray();
 		$.post(moduleUrl + endpoint, data , function(data) {
+			if (data.error) {
+				$('.error', form).remove();
+				$(form).prepend('<div class="error">' + data.error + '</div>');
+				return;
+			}
+
 			if (!matchId) {
 				window.history.pushState('', '', '?match=' + data.match.id);
 			}
+
 			updateMatch(data);
 			$('.options').removeClass('open');
 		});

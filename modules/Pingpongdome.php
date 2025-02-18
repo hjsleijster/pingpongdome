@@ -124,6 +124,9 @@ class Pingpongdome
 	}
 
 	private function xhr_newMatch() {
+		if ($this->request['player-side1'] == $this->request['player-side2']) {
+			return ['error' => 'Kies 2 verschillende spelers'];
+		}
 		$this->match_id = DB::q("INSERT INTO matches (best_out_of) VALUES (" . (int) $this->request['best_out_of'] . ")");
 		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side1'] . ", 1)");
 		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side2'] . ", 2)");
