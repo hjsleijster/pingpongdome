@@ -2,15 +2,15 @@
 	display: grid;
 	gap: 4px;
 	grid-template-columns: 1fr 1fr;
-	height: calc(100vh - 2 * 30px);
+	height: calc(100vh - 2 * 10px);
 
 	.side {
 		position: relative;
-		padding: 40px 50px 0;
+		padding: 30px 50px 0;
 		background-color: var(--ttgreen);
 
 		.player {
-			font-size: 60px;
+			font-size: 40px;
 			text-align: right;
 
 			/*&:before {
@@ -29,13 +29,14 @@
 		}
 
 		.points {
-			font-size: 240px;
-			line-height: 180px;
+			font-size: 200px;
+			line-height: 150px;
 			padding-left: 50px;
 		}
 
 		.games {
-			font-size: 100px;
+			font-size: 80px;
+			margin-top: -30px;
 		}
 
 		.score-plus {
@@ -84,14 +85,10 @@
 		cursor: pointer;
 
 		&#score-undo {
-			position: absolute;
-			bottom: 50px;
-			left: 50px;
+			left: 30px;
 		}
 
 		&#switch-sides {
-			position: absolute;
-			bottom: 50px;
 			left: 50%;
 			margin-left: -30px;
 			font-size: 36px;
@@ -99,10 +96,13 @@
 		}
 
 		&#toggle-options {
-			position: absolute;
-			bottom: 50px;
-			right: 50px;
+			right: 30px;
 		}
+	}
+
+	> .round-button {
+		position: absolute;
+		bottom: 30px;
 	}
 
 	.match-action {
@@ -112,13 +112,13 @@
 
 .options {
 	position: absolute;
-	top: 15%;
+	top: 10%;
 	left: 15%;
 	width: 70%;
-	height: 70%;
-	padding: 5%;
+	min-height: 80%;
+	padding: 10px;
 	background-color: #fffe;
-	border: 10px solid --var(ttorange);
+	border: 10px solid var(--ttorange);
 	text-align: center;
 	color: black;
 	display: none;
@@ -140,9 +140,7 @@
 	form {
 		> label {
 			display: block;
-			margin: 0 auto;
-			padding: 10px;
-			width: 300px;
+			margin: 12px auto;
 
 			label {
 				display: inline-block;
@@ -161,6 +159,6 @@
 	}
 
 	#end-match {
-		margin-top: 100px;
+		margin-top: 60px;
 	}
 }

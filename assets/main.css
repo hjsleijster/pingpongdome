@@ -15,7 +15,7 @@ html, body {
 
 body {
 	margin: 0;
-	border: 30px solid white;
+	border: 10px solid white;
 	color: white;
 }
 body, input, select {

@@ -43,6 +43,8 @@ $(function() {
 
 			updateMatch(data);
 			$('.options').removeClass('open');
+			$('.error', form).remove();
+
 		});
 	})
 

@@ -178,7 +178,6 @@ class Pingpongdome
 	}
 
 	private function xhr_getMatch() {
-		$this->match_id = (int) $this->request['match'];
 		$data = self::getMatchData();
 
 		$r = [];
