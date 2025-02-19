@@ -25,6 +25,7 @@ class Pingpongdome
 		Literiser::addHeadTag('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>');
 		Literiser::addHeadTag('<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">');
 		Literiser::addHeadTag('<meta name="viewport" content="user-scalable=no">');
+		Literiser::addHeadTag('<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>');
 		$r = '';
 
 		$r .= $this->renderMatch();
@@ -161,10 +162,15 @@ class Pingpongdome
 		$this->match_id = (int) $this->request['match'];
 		DB::q("DELETE FROM points WHERE match_id = " . $this->match_id . " ORDER BY id DESC LIMIT 1");
 		$data = self::getMatchData();
+		if ($data['match']['won_by_side']) {
+			DB::q("UPDATE matches SET won_by_side = NULL, finished_at = NULL WHERE id = " . $this->match_id);
+		}
 		$lastGame = end($data['games']);
 		if ($lastGame['side1_points'] == 0 && $lastGame['side2_points'] == 0 && count($data['games']) > 1) {
 			DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . ($lastGame['game'] - 1));
+		} elseif ($lastGame['won_by_side']) {
+			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 		}
 
 		$this->recalculateMatch();
