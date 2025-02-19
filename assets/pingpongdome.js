@@ -1,3 +1,4 @@
+"use strict"
 var moduleUrl = '/pingpongdome/';
 var matchId;
 
@@ -5,7 +6,7 @@ $(function() {
 	matchId = $('.match').data('match');
 
 	$('.score-plus').on('click', function() {
-		var side = $(this).parent().data('side');
+		let side = $(this).parent().data('side');
 		$.post(moduleUrl + 'scorePlus', {match: matchId, side: side}, function(data) {
 			updateMatch(data);
 		});
@@ -70,28 +71,32 @@ function getMatchData() {
 }
 
 function updateMatch(data) {
-	if (data.match.won_by_side) {
-		fireworks();
-	}
-
-	if (!Object.keys(data.state).length) {
+	if (!Object.keys(data.sides).length) {
 		return;
+	}
+	let sides = data.sides;
+
+	if (data.match.won_by_side) {
+		fireworks(data.match.won_by_side);
 	}
 
 	$('.match').data('match', data.match.id);
 	matchId = $('.match').data('match');
 
-	let state = data.state;
-	$('.side1 .player').text(state.side1.player);
-	$('.side1 .points').text(state.side1.points);
-	$('.side1 .games').text(state.side1.games);
-
-	$('.side2 .player').text(state.side2.player);
-	$('.side2 .points').text(state.side2.points);
-	$('.side2 .games').text(state.side2.games);
+	for (var i = 1; i <= 2; i++) {
+		let side = sides[i];
+		['player', 'points', 'games'].forEach(function(field) {
+			let el = $('.' + field, '.side' + i);
+			if (el.text() != side[field]) {
+				el.fadeOut(100, function() {
+					el.text(side[field]).fadeIn(600);
+				});
+			}
+		});
+	}
 
 	$('.match-action').toggle(!data.match.finished_at);
-	$('#score-undo').toggle(0 != state.side1.points + state.side1.games + state.side2.points + state.side2.games);
+	$('#score-undo').toggle(0 != sides[1].points + sides[1].games + sides[2].points + sides[2].games);
 
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
 }
@@ -112,8 +117,8 @@ function toggleOptions() {
 	}
 }
 
-function fireworks() {
-	var duration = 5 * 1000;
+function fireworks(side) {
+	var duration = 15 * 1000;
 	var animationEnd = Date.now() + duration;
 	var defaults = { startVelocity: 30, spread: 30, ticks: 100, zIndex: 0 };
 
@@ -129,8 +134,13 @@ function fireworks() {
 		}
 
 		var particleCount = 50 * (timeLeft / duration);
-	  // since particles fall down, start a bit higher than random
-		confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-		confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+		if (side == 1) {
+			var posA = 0.1;
+			var posB = 0.3;
+		} else {
+			var posA = 0.6;
+			var posB = 0.8;
+		}
+		confetti({ ...defaults, particleCount, origin: { x: randomInRange(posA, posB), y: Math.random() - 0.1 } });
 	}, 250);
 }

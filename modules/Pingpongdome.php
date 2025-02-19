@@ -188,16 +188,16 @@ class Pingpongdome
 		$r['match'] = $data['match'];
 		$r['games'] = $data['games'];
 
-		$r['state'] = [];
+		$r['sides'] = [];
 		if ($data['games']) {
 			$lastGame = end($data['games']);
 			foreach ([1, 2] as $side) {
-				$r['state']['side' . $side]['games'] = $data['match']['side' . $side . '_games'];
-				$r['state']['side' . $side]['points'] = $lastGame['side' . $side . '_points'];
+				$r['sides'][$side]['games'] = $data['match']['side' . $side . '_games'];
+				$r['sides'][$side]['points'] = $lastGame['side' . $side . '_points'];
 			}
 
 			foreach ($data['players'] as $player) {
-				$r['state']['side' . $player['side']]['player'] = $player['first_name'];
+				$r['sides'][$player['side']]['player'] = $player['first_name'];
 			}
 		}
 
