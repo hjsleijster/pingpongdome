@@ -83,7 +83,6 @@ class Pingpongdome
 
 	private function renderSide($side) {
 		$r = '';
-
 		$r .= '<div class="side side' . $side . '" data-side="' . $side . '">';
 		$r .= '<h1 class="player">&nbsp;</h1>';
 		$r .= '<span class="score-plus round-button match-action">+</span>';
@@ -128,6 +127,7 @@ class Pingpongdome
 		if ($this->request['player-side1'] == $this->request['player-side2']) {
 			return ['error' => 'Kies 2 verschillende spelers'];
 		}
+
 		$this->match_id = DB::q("INSERT INTO matches (best_out_of) VALUES (" . (int) $this->request['best_out_of'] . ")");
 		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side1'] . ", 1)");
 		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side2'] . ", 2)");
@@ -138,6 +138,7 @@ class Pingpongdome
 
 	private function xhr_updateMatch($args) {
 		$this->match_id = (int) $args[0];
+
 		DB::q("UPDATE matches SET best_out_of = " . (int) $this->request['best_out_of'] . " WHERE id = " . $this->match_id);
 
 		return $this->xhr_getMatch();
@@ -162,15 +163,18 @@ class Pingpongdome
 		$this->match_id = (int) $this->request['match'];
 		DB::q("DELETE FROM points WHERE match_id = " . $this->match_id . " ORDER BY id DESC LIMIT 1");
 		$data = self::getMatchData();
+		$lastGame = end($data['games']);
+
+		// undo win
 		if ($data['match']['won_by_side']) {
 			DB::q("UPDATE matches SET won_by_side = NULL, finished_at = NULL WHERE id = " . $this->match_id);
+			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 		}
-		$lastGame = end($data['games']);
+
+		// undo previous game win
 		if ($lastGame['side1_points'] == 0 && $lastGame['side2_points'] == 0 && count($data['games']) > 1) {
 			DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . ($lastGame['game'] - 1));
-		} elseif ($lastGame['won_by_side']) {
-			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 		}
 
 		$this->recalculateMatch();
