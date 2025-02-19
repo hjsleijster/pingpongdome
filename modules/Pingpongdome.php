@@ -123,6 +123,54 @@ class Pingpongdome
 		return $data;
 	}
 
+	private function recalculateMatch($match_id = null) {
+		$match_id = $match_id ?? $this->match_id;
+
+		$data = self::getMatchData($match_id);
+		$lastGame = end($data['games']);
+		$side1points = $lastGame['side1_points'];
+		$side2points = $lastGame['side2_points'];
+		$mostPoints = max($side1points, $side2points);
+		$pointsDiff = abs($side1points - $side2points);
+
+		// game won
+		if ($mostPoints >= 11 && $pointsDiff >= 2) {
+			$wonBySide = $side1points > $side2points ? 1 : 2;
+			DB::q("UPDATE games SET won_by_side = " . $wonBySide . " WHERE match_id = " . $match_id . " AND game = " . $lastGame['game']);
+
+			// match won
+			if ($data['match']['side' . $wonBySide . '_games'] + 1 > $data['match']['best_out_of'] / 2) {
+				DB::q("UPDATE matches SET won_by_side = " . $wonBySide . ", finished_at = NOW() WHERE id = " . $match_id);
+			// new game
+			} else {
+				DB::q("INSERT INTO games (match_id, game) VALUES (" . $match_id . ", " . (count($data['games']) + 1) . ")");
+			}
+		}
+	}
+
+	private function xhr_getMatch() {
+		$data = self::getMatchData();
+
+		$r = [];
+		$r['match'] = $data['match'];
+		$r['games'] = $data['games'];
+
+		$r['sides'] = [];
+		if ($data['games']) {
+			$lastGame = end($data['games']);
+			foreach ([1, 2] as $side) {
+				$r['sides'][$side]['games'] = $data['match']['side' . $side . '_games'];
+				$r['sides'][$side]['points'] = $lastGame['side' . $side . '_points'];
+			}
+
+			foreach ($data['players'] as $player) {
+				$r['sides'][$player['side']]['player'] = $player['first_name'];
+			}
+		}
+
+		return $r;
+	}
+
 	private function xhr_newMatch() {
 		if ($this->request['player-side1'] == $this->request['player-side2']) {
 			return ['error' => 'Kies 2 verschillende spelers'];
@@ -179,53 +227,5 @@ class Pingpongdome
 
 		$this->recalculateMatch();
 		return $this->xhr_getMatch();
-	}
-
-	private function xhr_getMatch() {
-		$data = self::getMatchData();
-
-		$r = [];
-		$r['match'] = $data['match'];
-		$r['games'] = $data['games'];
-
-		$r['sides'] = [];
-		if ($data['games']) {
-			$lastGame = end($data['games']);
-			foreach ([1, 2] as $side) {
-				$r['sides'][$side]['games'] = $data['match']['side' . $side . '_games'];
-				$r['sides'][$side]['points'] = $lastGame['side' . $side . '_points'];
-			}
-
-			foreach ($data['players'] as $player) {
-				$r['sides'][$player['side']]['player'] = $player['first_name'];
-			}
-		}
-
-		return $r;
-	}
-
-	private function recalculateMatch($match_id = null) {
-		$match_id = $match_id ?? $this->match_id;
-
-		$data = self::getMatchData($match_id);
-		$lastGame = end($data['games']);
-		$side1points = $lastGame['side1_points'];
-		$side2points = $lastGame['side2_points'];
-		$mostPoints = max($side1points, $side2points);
-		$pointsDiff = abs($side1points - $side2points);
-
-		// game won
-		if ($mostPoints >= 11 && $pointsDiff >= 2) {
-			$wonBySide = $side1points > $side2points ? 1 : 2;
-			DB::q("UPDATE games SET won_by_side = " . $wonBySide . " WHERE match_id = " . $match_id . " AND game = " . $lastGame['game']);
-
-			// match won
-			if ($data['match']['side' . $wonBySide . '_games'] + 1 > $data['match']['best_out_of'] / 2) {
-				DB::q("UPDATE matches SET won_by_side = " . $wonBySide . ", finished_at = NOW() WHERE id = " . $match_id);
-			// new game
-			} else {
-				DB::q("INSERT INTO games (match_id, game) VALUES (" . $match_id . ", " . (count($data['games']) + 1) . ")");
-			}
-		}
 	}
 }
