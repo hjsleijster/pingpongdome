@@ -108,6 +108,16 @@
 	.match-action {
 		display: none;
 	}
+
+	#enable-fullscreen {
+		@media only screen and (min: 1280px) {
+			display: none;
+		}
+
+		right: 110px;
+		font-size: 40px;
+		padding-top: 4px;
+	}
 }
 
 .options {

@@ -22,6 +22,12 @@ $(function() {
 		$('.side1').toggleClass('switched');
 	});
 
+
+	$('#enable-fullscreen').on('click', function() {
+		document.documentElement.webkitRequestFullscreen();
+		$(this).hide();
+	});
+
 	$('#toggle-options').on('click', function() {
 		toggleOptions();
 	});
