@@ -45,7 +45,7 @@
 			margin-top: 15px;
 		}
 
-		&.side1:not(.switched), &.switched + .side  {
+		&.side1:not(.switched), &.switched + .side {
 			text-align: right;
 
 			.points {
@@ -122,6 +122,7 @@
 
 .options {
 	position: absolute;
+	z-index: 1;
 	top: 10%;
 	left: 15%;
 	width: 70%;
