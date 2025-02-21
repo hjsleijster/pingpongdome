@@ -1,6 +1,7 @@
 "use strict"
 var moduleUrl = '/pingpongdome/';
 var matchId;
+var matchData;
 var fireworksInterval;
 
 $(function() {
@@ -37,9 +38,9 @@ $(function() {
 	$('form').on('submit', function(e) {
 		e.preventDefault();
 		let form = this;
-		let endpoint = matchId ? 'updateMatch/' + matchId : 'newMatch';
+		let endpoint = matchId ? 'updateMatch' : 'newMatch';
 		let data = $(this).serializeArray();
-		$.post(moduleUrl + endpoint, data , function(data) {
+		$.post(moduleUrl + endpoint, data, function(data) {
 			if (data.error) {
 				$('.error', form).remove();
 				$(form).prepend('<div class="error">' + data.error + '</div>');
@@ -53,7 +54,7 @@ $(function() {
 			updateMatch(data);
 			$('.options').removeClass('open');
 			$('.error', form).remove();
-		});
+		}, 'json');
 	})
 
 
@@ -65,7 +66,7 @@ $(function() {
 		}
 	});
 
-	if (matchId) {
+	if (matchId > 0) {
 		getMatchData();
 	} else {
 		$('#toggle-options').click();
@@ -79,33 +80,36 @@ function getMatchData() {
 }
 
 function updateMatch(data) {
+	matchData = data;
+	matchId = data.match ? data.match.id : 0;
+	$('.match').data('match', matchId);
+
 	if (!Object.keys(data.sides).length) {
+		window.history.pushState('', '', '?');
+		$('.match-action').toggle(false);
+		$('#toggle-options').click();
 		return;
 	}
-	let sides = data.sides;
 
 	if (data.match.won_by_side) {
 		fireworks(data.match.won_by_side);
 	}
 
-	$('.match').data('match', data.match.id);
-	matchId = $('.match').data('match');
-
 	for (var i = 1; i <= 2; i++) {
-		let side = sides[i];
+		let side = data.sides[i];
 		['player', 'points', 'games'].forEach(function(field) {
 			let el = $('.' + field, '.side' + i);
 			if (el.text() != side[field]) {
 				el.fadeOut(100, function() {
-					el.text(side[field]).fadeIn(600);
+					el.text(side[field]).fadeIn(300);
 				});
 			}
 		});
 	}
 
+	// game is over
 	$('.match-action').toggle(!data.match.finished_at);
-	$('#score-undo').toggle(0 != sides[1].points + sides[1].games + sides[2].points + sides[2].games);
-
+	// set form data
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
 }
 
@@ -113,14 +117,20 @@ function toggleOptions() {
 	$('.options').toggleClass('open');
 
 	if ($('.options').hasClass('open')) {
-		if (matchId) {
+		// ongoing match
+		if (matchId && !matchData.match.won_by_side) {
+			$('input[type=hidden][name=match]').val(matchId);
 			$('select[name^="player-side"]').attr('required', false);
 			$('.edit-match').show();
 			$('.new-match').hide();
+			$('#end-match').show();
+		// new match of match finished
 		} else {
+			$('input[type=hidden][name=match]').val(0);
 			$('select[name^="player-side"]').attr('required', true);
 			$('.edit-match').hide();
 			$('.new-match').show();
+			$('#end-match').hide();
 		}
 	}
 }

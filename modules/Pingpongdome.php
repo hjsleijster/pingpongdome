@@ -49,6 +49,7 @@ class Pingpongdome
 		$r .= '<div class="options">';
 
 		$r .= '<form>';
+		$r .= '<input type="hidden" name="match" value="">';
 		$r .= '<label>Best out of: ';
 		$r .= '<label><input type="radio" name="best_out_of" value="3" required> 3</label>';
 		$r .= '<label><input type="radio" name="best_out_of" value="5" required> 5</label>';
@@ -60,7 +61,7 @@ class Pingpongdome
 		$r .= '<input type="submit" class="button new-match" value="Start!">';
 		$r .= '<input type="submit" class="button edit-match" value="Wedstrijd aanpassen">';
 		$r .= '</form>';
-		$r .= '<a id="end-match" class="edit-match button">Wedstrijd beëindigen</a>';
+		$r .= '<a id="end-match" class="button">Wedstrijd beëindigen</a>';
 		$r .= '</div>';
 
 		$r .= '</div>';
@@ -102,7 +103,7 @@ class Pingpongdome
 				SELECT m.*, IFNULL(SUM(g.won_by_side = 1), 0) `side1_games`, IFNULL(SUM(g.won_by_side = 2), 0) `side2_games`
 				FROM matches m
 				LEFT JOIN games g ON m.id = g.match_id AND g.won_by_side IS NOT NULL
-				WHERE m.id = " . $match_id . "
+				WHERE deleted_at IS NULL AND m.id = " . $match_id . "
 				GROUP BY m.id"
 			),
 			'games' => DB::rows(
@@ -185,8 +186,8 @@ class Pingpongdome
 		return $this->xhr_getMatch();
 	}
 
-	private function xhr_updateMatch($args) {
-		$this->match_id = (int) $args[0];
+	private function xhr_updateMatch() {
+		$this->match_id = (int) $this->request['match'];
 
 		DB::q("UPDATE matches SET best_out_of = " . (int) $this->request['best_out_of'] . " WHERE id = " . $this->match_id);
 
@@ -210,7 +211,11 @@ class Pingpongdome
 
 	private function xhr_scoreUndo() {
 		$this->match_id = (int) $this->request['match'];
-		DB::q("DELETE FROM points WHERE match_id = " . $this->match_id . " ORDER BY id DESC LIMIT 1");
+		$lastPoint = DB::val("SELECT id FROM points WHERE match_id = " . $this->match_id . " ORDER BY id DESC LIMIT 1");
+		if ($lastPoint) {
+			DB::q("DELETE FROM points WHERE id = " . $lastPoint);
+		}
+
 		$data = self::getMatchData();
 		$lastGame = end($data['games']);
 
@@ -220,10 +225,18 @@ class Pingpongdome
 			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 		}
 
-		// undo previous game win
-		if ($lastGame['side1_points'] == 0 && $lastGame['side2_points'] == 0 && count($data['games']) > 1) {
-			DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
-			DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . ($lastGame['game'] - 1));
+		// zero points
+		if ($lastGame['side1_points'] == 0 && $lastGame['side2_points'] == 0) {
+			// undo previous game win
+			if (count($data['games']) > 1) {
+				DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
+				DB::q("UPDATE games SET won_by_side = NULL WHERE match_id = " . $this->match_id . " AND game = " . ($lastGame['game'] - 1));
+			// delete match
+			} elseif (!$lastPoint) {
+				DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
+				DB::q("UPDATE matches SET deleted_at = NOW() WHERE id = " . $this->match_id);
+				return $this->xhr_getMatch();
+			}
 		}
 
 		$this->recalculateMatch();
