@@ -1,6 +1,7 @@
 "use strict"
 var moduleUrl = '/pingpongdome/';
 var matchId;
+var fireworksInterval;
 
 $(function() {
 	matchId = $('.match').data('match');
@@ -15,6 +16,7 @@ $(function() {
 	$('#score-undo').on('click', function() {
 		$.post(moduleUrl + 'scoreUndo', {match: matchId}, function(data) {
 			updateMatch(data);
+			clearInterval(fireworksInterval);
 		});
 	});
 
@@ -132,20 +134,20 @@ function fireworks(side) {
 		return Math.random() * (max - min) + min;
 	}
 
-	var interval = setInterval(function() {
+	fireworksInterval = setInterval(function() {
 		var timeLeft = animationEnd - Date.now();
 
 		if (timeLeft <= 0) {
-			return clearInterval(interval);
+			return clearInterval(fireworksInterval);
 		}
 
-		var particleCount = 50 * (timeLeft / duration);
+		var particleCount = 150 * (timeLeft / duration);
 		if (side == 1) {
 			var posA = 0.1;
 			var posB = 0.3;
 		} else {
-			var posA = 0.6;
-			var posB = 0.8;
+			var posA = 0.8;
+			var posB = 0.7;
 		}
 		confetti({ ...defaults, particleCount, origin: { x: randomInRange(posA, posB), y: Math.random() - 0.1 } });
 	}, 250);
