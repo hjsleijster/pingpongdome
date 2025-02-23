@@ -152,7 +152,7 @@ function fireworks(side) {
 		}
 
 		var particleCount = 150 * (timeLeft / duration);
-		if (side == 1) {
+		if (side == 1 || side == 2 && $('.side1').hasClass('switched')) {
 			var posA = 0.1;
 			var posB = 0.3;
 		} else {
