@@ -1,3 +1,4 @@
 composer.lock
 vendor
 literiser-env.ini
+db/version
