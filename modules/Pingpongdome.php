@@ -170,17 +170,47 @@ class Pingpongdome
 			}
 		}
 
+		$startedMatch = $data['match']['side_started'];
+		$otherSide = $startedMatch == 1 ? 2 : 1;
+		$startedGame = count($data['games']) % 2 == 1 ? $data['match']['side_started'] : $otherSide;
+		$otherSide = $startedGame == 1 ? 2 : 1;
+		$totalPointsGame = $lastGame['side1_points'] + $lastGame['side2_points'];
+		if ($totalPointsGame > 20) {
+			$serving = $totalPointsGame % 2 == 0 ? $startedGame : $otherSide;
+		} else {
+			$serving = $totalPointsGame % 4 < 2 ? $startedGame : $otherSide;
+		}
+		$r['match']['serving'] = $serving;
+
 		return $r;
 	}
 
 	private function xhr_newMatch() {
-		if ($this->request['player-side1'] == $this->request['player-side2']) {
+		$player1 = (int) $this->request['player-side1'];
+		$player2 = (int) $this->request['player-side2'];
+		$bestOutOf = (int) $this->request['best_out_of'];
+		if ($player1 == $player2) {
 			return ['error' => 'Kies 2 verschillende spelers'];
 		}
 
-		$this->match_id = DB::q("INSERT INTO matches (best_out_of) VALUES (" . (int) $this->request['best_out_of'] . ")");
-		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side1'] . ", 1)");
-		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . (int) $this->request['player-side2'] . ", 2)");
+		$type = 'single';
+
+		$sideStarted = 1;
+		if ($type == 'single') {
+			$sideStartedLastMatch = DB::val("SELECT side_started FROM matches
+				WHERE id IN (SELECT match_id FROM match_players WHERE player_id IN (" . $player1 . ',' . $player2 . ") GROUP BY match_id HAVING COUNT(*) > 1)
+				AND type = 'single' AND finished_at IS NOT NULL AND deleted_at IS NULL
+				ORDER BY id DESC LIMIT 1");
+			if ($sideStartedLastMatch) {
+				$sideStarted = $sideStartedLastMatch == 1 ? 2 :1;
+			} else {
+				$sideStarted = rand(1, 2);
+			}
+		}
+
+		$this->match_id = DB::q("INSERT INTO matches (type, best_out_of, side_started) VALUES ('" . $type . "', " . $bestOutOf . ", " . $sideStarted . ")");
+		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . $player1 . ", 1)");
+		DB::q("INSERT INTO match_players (match_id, player_id, side) VALUES (" . $this->match_id . ", " . $player2 . ", 2)");
 		DB::q("INSERT INTO games (match_id, game) VALUES (" . $this->match_id . ", 1)");
 
 		return $this->xhr_getMatch();
@@ -188,8 +218,9 @@ class Pingpongdome
 
 	private function xhr_updateMatch() {
 		$this->match_id = (int) $this->request['match'];
+		$bestOutOf = (int) $this->request['best_out_of'];
 
-		DB::q("UPDATE matches SET best_out_of = " . (int) $this->request['best_out_of'] . " WHERE id = " . $this->match_id);
+		DB::q("UPDATE matches SET best_out_of = " . $bestOutOf . " WHERE id = " . $this->match_id);
 
 		return $this->xhr_getMatch();
 	}

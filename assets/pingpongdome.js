@@ -107,6 +107,9 @@ function updateMatch(data) {
 		});
 	}
 
+	$('.serving').removeClass('serving');
+	$('.side' + data.match.serving).addClass('serving');
+
 	// game is over
 	$('.match-action').toggle(!data.match.finished_at);
 	// set form data
@@ -124,7 +127,7 @@ function toggleOptions() {
 			$('.edit-match').show();
 			$('.new-match').hide();
 			$('#end-match').show();
-		// new match of match finished
+		// new match
 		} else {
 			$('input[type=hidden][name=match]').val(0);
 			$('select[name^="player-side"]').attr('required', true);
