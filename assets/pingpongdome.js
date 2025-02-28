@@ -8,23 +8,16 @@ $(function() {
 	matchId = $('.match').data('match');
 
 	$('.score-plus').on('click', function() {
-		let side = $(this).parent().data('side');
-		$.post(moduleUrl + 'scorePlus', {match: matchId, side: side}, function(data) {
-			updateMatch(data);
-		});
+		scorePlus($(this).parent().data('side'));
 	});
 
 	$('#score-undo').on('click', function() {
-		$.post(moduleUrl + 'scoreUndo', {match: matchId}, function(data) {
-			updateMatch(data);
-			clearInterval(fireworksInterval);
-		});
+		scoreUndo();
 	});
 
 	$('#switch-sides').on('click', function() {
 		$('.side1').toggleClass('switched');
 	});
-
 
 	$('#enable-fullscreen').on('click', function() {
 		document.documentElement.webkitRequestFullscreen();
@@ -36,27 +29,8 @@ $(function() {
 	});
 
 	$('form').on('submit', function(e) {
-		e.preventDefault();
-		let form = this;
-		let endpoint = matchId ? 'updateMatch' : 'newMatch';
-		let data = $(this).serializeArray();
-		$.post(moduleUrl + endpoint, data, function(data) {
-			if (data.error) {
-				$('.error', form).remove();
-				$(form).prepend('<div class="error">' + data.error + '</div>');
-				return;
-			}
-
-			if (!matchId) {
-				window.history.pushState('', '', '?match=' + data.match.id);
-			}
-
-			updateMatch(data);
-			$('.options').removeClass('open');
-			$('.error', form).remove();
-		}, 'json');
+		submitForm(this);
 	})
-
 
 	$('#end-match').on('click', function() {
 		if (confirm('Sure?')) {
@@ -76,6 +50,19 @@ $(function() {
 function getMatchData() {
 	$.get(moduleUrl + 'getMatch', {match: matchId}, function(data) {
 		updateMatch(data);
+	});
+}
+
+function scorePlus(side) {
+	$.post(moduleUrl + 'scorePlus', {match: matchId, side: side}, function(data) {
+		updateMatch(data);
+	});
+}
+
+function scoreUndo() {
+	$.post(moduleUrl + 'scoreUndo', {match: matchId}, function(data) {
+		updateMatch(data);
+		clearInterval(fireworksInterval);
 	});
 }
 
@@ -114,6 +101,27 @@ function updateMatch(data) {
 	$('.match-action').toggle(!data.match.finished_at);
 	// set form data
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
+}
+
+function submitForm(form) {
+	e.preventDefault();
+	let endpoint = matchId ? 'updateMatch' : 'newMatch';
+	let data = $(form).serializeArray();
+	$.post(moduleUrl + endpoint, data, function(data) {
+		if (data.error) {
+			$('.error', form).remove();
+			$(form).prepend('<div class="error">' + data.error + '</div>');
+			return;
+		}
+
+		if (!matchId) {
+			window.history.pushState('', '', '?match=' + data.match.id);
+		}
+
+		updateMatch(data);
+		$('.options').removeClass('open');
+		$('.error', form).remove();
+	}, 'json');
 }
 
 function toggleOptions() {
