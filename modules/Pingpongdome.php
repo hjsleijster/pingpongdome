@@ -26,6 +26,7 @@ class Pingpongdome
 		Literiser::addHeadTag('<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">');
 		Literiser::addHeadTag('<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">');
 		Literiser::addHeadTag('<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>');
+		Literiser::addHeadTag('<script src="/assets/jquery.touch.min.js"></script>');
 		$r = '';
 
 		$r .= $this->renderMatch();

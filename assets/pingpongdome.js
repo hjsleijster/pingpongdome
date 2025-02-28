@@ -45,6 +45,8 @@ $(function() {
 	} else {
 		$('#toggle-options').click();
 	}
+
+	gestures();
 });
 
 function getMatchData() {
@@ -172,4 +174,36 @@ function fireworks(side) {
 		}
 		confetti({ ...defaults, particleCount, origin: { x: randomInRange(posA, posB), y: Math.random() - 0.1 } });
 	}, 250);
+}
+
+// https://github.com/ajlkn/jquery.touch
+function gestures() {
+	var e = $('body');
+	e.touch();
+	e
+	// side 1 plus score
+	.on('swipeLeft', function(event, info) {
+		scorePlus($('.side1').hasClass('switched') ? 2 : 1);
+	})
+	// side 2 plus score
+	.on('swipeRight', function(event) {
+		scorePlus($('.side1').hasClass('switched') ? 1 : 2);
+	})
+	// plus score (or close options first)
+	.on('tap', function(event, info) {
+		if ($('.options').hasClass('open')) {
+			toggleOptions();
+		} else {
+			let side = $(info.event.target).data('side');
+			scorePlus(side);
+		}
+	})
+	// undo
+	.on('tapAndHold', function(event) {
+		scoreUndo();
+	})
+	// open options
+	.on('doubleTap', function(event) {
+		toggleOptions();
+	});
 }
