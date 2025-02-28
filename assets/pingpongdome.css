@@ -3,6 +3,7 @@
 	gap: 4px;
 	grid-template-columns: 1fr 1fr;
 	height: calc(100vh - 2 * 10px);
+	user-select: none;
 
 	.side {
 		position: relative;
@@ -22,8 +23,9 @@
 				display: none;
 				width: 35px;
 				height: 35px;
-				background-color: var(--ttorange);
+				background: radial-gradient(circle at 10px 10px, var(--ttorange), var(--ttorange), #000);
 				border-radius: 50%;
+				box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
 			}
 		}
 
