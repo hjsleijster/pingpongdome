@@ -47,6 +47,7 @@ class Pingpongdome
 		};
 
 		$r = '';
+		$r .= '<div class="options-modal">';
 		$r .= '<div class="options">';
 
 		$r .= '<form>';
@@ -65,6 +66,7 @@ class Pingpongdome
 		$r .= '<a id="end-match" class="button">Wedstrijd beëindigen</a>';
 		$r .= '</div>';
 
+		$r .= '</div>';
 		$r .= '</div>';
 
 		return $r;

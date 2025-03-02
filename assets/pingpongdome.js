@@ -24,8 +24,10 @@ $(function() {
 		$(this).hide();
 	});
 
-	$('#toggle-options').on('click', function() {
-		toggleOptions();
+	$('#toggle-options, .options-modal').on('click', function(event) {
+		if (event.target == this) {
+			toggleOptions();
+		}
 	});
 
 	$('form').on('submit', function(e) {
@@ -43,7 +45,7 @@ $(function() {
 	if (matchId > 0) {
 		getMatchData();
 	} else {
-		$('#toggle-options').click();
+		toggleOptions();
 	}
 
 	gestures();
@@ -64,7 +66,6 @@ function scorePlus(side) {
 function scoreUndo() {
 	$.post(moduleUrl + 'scoreUndo', {match: matchId}, function(data) {
 		updateMatch(data);
-		clearInterval(fireworksInterval);
 	});
 }
 
@@ -73,10 +74,9 @@ function updateMatch(data) {
 	matchId = data.match ? data.match.id : 0;
 	$('.match').data('match', matchId);
 
-	if (!Object.keys(data.sides).length) {
 		window.history.pushState('', '', '?');
 		$('.match-action').toggle(false);
-		$('#toggle-options').click();
+		toggleOptions();
 		return;
 	}
 
@@ -106,30 +106,29 @@ function updateMatch(data) {
 }
 
 function submitForm(form) {
-	e.preventDefault();
-	let endpoint = matchId ? 'updateMatch' : 'newMatch';
-	let data = $(form).serializeArray();
-	$.post(moduleUrl + endpoint, data, function(data) {
+	let formdata = $(form).serializeArray();
+	let endpoint = formdata.match ? 'updateMatch' : 'newMatch';
+	$.post(moduleUrl + endpoint, formdata, function(data) {
 		if (data.error) {
 			$('.error', form).remove();
 			$(form).prepend('<div class="error">' + data.error + '</div>');
 			return;
 		}
 
-		if (!matchId) {
+		if (!formdata.match) {
 			window.history.pushState('', '', '?match=' + data.match.id);
 		}
 
 		updateMatch(data);
-		$('.options').removeClass('open');
+		$('.options-modal').removeClass('open');
 		$('.error', form).remove();
 	}, 'json');
 }
 
 function toggleOptions() {
-	$('.options').toggleClass('open');
+	$('.options-modal').toggleClass('open');
 
-	if ($('.options').hasClass('open')) {
+	if ($('.options-modal').hasClass('open')) {
 		// ongoing match
 		if (matchId && !matchData.match.won_by_side) {
 			$('input[type=hidden][name=match]').val(matchId);
