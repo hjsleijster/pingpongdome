@@ -31,6 +31,7 @@ $(function() {
 	});
 
 	$('form').on('submit', function(e) {
+		e.preventDefault();
 		submitForm(this);
 	})
 
@@ -64,12 +65,17 @@ function scorePlus(side) {
 }
 
 function scoreUndo() {
+	if (!matchId) {
+		return;
+	}
+
 	$.post(moduleUrl + 'scoreUndo', {match: matchId}, function(data) {
 		updateMatch(data);
 	});
 }
 
 function updateMatch(data) {
+	clearInterval(fireworksInterval);
 	matchData = data;
 	matchId = data.match ? data.match.id : 0;
 	$('.match').data('match', matchId);
@@ -207,9 +213,5 @@ function gestures() {
 	// undo
 	.on('tapAndHold', function(event) {
 		scoreUndo();
-	})
-	// open options
-	.on('doubleTap', function(event) {
-		toggleOptions();
 	});
 }
