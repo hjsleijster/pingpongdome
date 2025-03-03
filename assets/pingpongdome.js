@@ -80,6 +80,7 @@ function updateMatch(data) {
 	matchId = data.match ? data.match.id : 0;
 	$('.match').data('match', matchId);
 
+	if (data === undefined || !Object.keys(data).length || !Object.keys(data.sides).length) {
 		window.history.pushState('', '', '?');
 		$('.match-action').toggle(false);
 		toggleOptions();

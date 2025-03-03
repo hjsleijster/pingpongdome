@@ -101,6 +101,11 @@ class Pingpongdome
 	private function getMatchData($match_id = null) {
 		$match_id = $match_id ?? $this->match_id;
 
+		$exists = DB::val("SELECT id, deleted_at FROM matches WHERE deleted_at IS NULL AND id = " . $match_id);
+		if (!$exists) {
+			return [];
+		}
+
 		$data = [
 			'match' => DB::row("
 				SELECT m.*, IFNULL(SUM(g.won_by_side = 1), 0) `side1_games`, IFNULL(SUM(g.won_by_side = 2), 0) `side2_games`
@@ -132,6 +137,10 @@ class Pingpongdome
 		$match_id = $match_id ?? $this->match_id;
 
 		$data = self::getMatchData($match_id);
+		if (!$data) {
+			return;
+		}
+
 		$lastGame = end($data['games']);
 		$side1points = $lastGame['side1_points'];
 		$side2points = $lastGame['side2_points'];
@@ -155,6 +164,9 @@ class Pingpongdome
 
 	private function xhr_getMatch() {
 		$data = self::getMatchData();
+		if (!$data) {
+			return [];
+		}
 
 		$r = [];
 		$r['match'] = $data['match'];
@@ -269,7 +281,6 @@ class Pingpongdome
 			} elseif (!$lastPoint) {
 				DB::q("DELETE FROM games WHERE match_id = " . $this->match_id . " AND game = " . $lastGame['game']);
 				DB::q("UPDATE matches SET deleted_at = NOW() WHERE id = " . $this->match_id);
-				return $this->xhr_getMatch();
 			}
 		}
 
