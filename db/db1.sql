@@ -1,5 +1,3 @@
--- Adminer 4.8.4 MySQL 10.11.6-MariaDB-0+deb12u1 dump
-
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
@@ -64,6 +62,3 @@ CREATE TABLE `points` (
   CONSTRAINT `points_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`),
   CONSTRAINT `points_ibfk_2` FOREIGN KEY (`game`) REFERENCES `games` (`game`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- 2025-02-18 22:20:46
