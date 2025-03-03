@@ -177,7 +177,7 @@ function fireworks(side) {
 
 // https://github.com/ajlkn/jquery.touch
 function gestures() {
-	var e = $('body');
+	var e = $('.match');
 	e.touch();
 	e
 	// side 1 plus score
@@ -190,12 +190,19 @@ function gestures() {
 	})
 	// plus score (or close options first)
 	.on('tap', function(event, info) {
-		if ($('.options').hasClass('open')) {
-			toggleOptions();
+		let target = $(info.event.target);
+		let side;
+		if (target.hasClass('points') || target.hasClass('player')) {
+			side = target.parent().data('side');
 		} else {
-			let side = $(info.event.target).data('side');
-			scorePlus(side);
+			side = target.data('side');
 		}
+
+		if (!side) {
+			return;
+		}
+
+		scorePlus(side);
 	})
 	// undo
 	.on('tapAndHold', function(event) {

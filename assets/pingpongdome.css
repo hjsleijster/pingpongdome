@@ -42,6 +42,7 @@
 		.games {
 			font-size: 80px;
 			margin-top: -30px;
+			width: 50%;
 		}
 
 		.score-plus {
@@ -56,6 +57,11 @@
 			.points {
 				padding-left: 0px;
 				padding-right: 50px;
+			}
+
+			.games {
+				width: 50%;
+				margin-left: 50%;
 			}
 
 			.player {
