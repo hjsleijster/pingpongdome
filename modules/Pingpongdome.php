@@ -53,6 +53,7 @@ class Pingpongdome
 		$r .= '<form>';
 		$r .= '<input type="hidden" name="match" value="">';
 		$r .= '<label>Best out of: ';
+		$r .= '<label><input type="radio" name="best_out_of" value="1" required> 1</label>';
 		$r .= '<label><input type="radio" name="best_out_of" value="3" required> 3</label>';
 		$r .= '<label><input type="radio" name="best_out_of" value="5" required> 5</label>';
 		$r .= '</label>';
