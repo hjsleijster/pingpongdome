@@ -124,7 +124,7 @@
 		bottom: 30px;
 	}
 
-	.match-action {
+	.match-action:not(#score-undo) {
 		display: none;
 	}
 

@@ -107,7 +107,7 @@ function updateMatch(data) {
 	$('.side' + data.match.serving).addClass('serving');
 
 	// game is over
-	$('.match-action').toggle(!data.match.finished_at);
+	$('.match-action:not(#score-undo)').toggle(!data.match.finished_at);
 	// set form data
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
 }
@@ -211,9 +211,5 @@ function gestures() {
 		}
 
 		scorePlus(side);
-	})
-	// undo
-	.on('tapAndHold', function(event) {
-		scoreUndo();
 	});
 }
