@@ -219,16 +219,20 @@ class Pingpongdome
 
 		$type = 'single';
 
-		$sideStarted = 1;
+		$sideStarted = rand(1, 2);
 		if ($type == 'single') {
-			$sideStartedLastMatch = DB::val("SELECT side_started FROM matches
-				WHERE id IN (SELECT match_id FROM match_players WHERE player_id IN (" . $player1 . ',' . $player2 . ") GROUP BY match_id HAVING COUNT(*) > 1)
+			$playerStartedLastMatch = DB::val("SELECT player_started.player_id
+				FROM matches m
+				INNER JOIN match_players mp ON m.id = mp.match_id AND mp.player_id IN (" . $player1 . ',' . $player2 . ")
+				INNER JOIN (
+					SELECT match_id, side, player_id
+					FROM match_players
+					WHERE 1
+				) player_started ON m.id = player_started.match_id AND m.side_started = player_started.side
 				AND type = 'single' AND finished_at IS NOT NULL AND deleted_at IS NULL
 				ORDER BY id DESC LIMIT 1");
-			if ($sideStartedLastMatch) {
-				$sideStarted = $sideStartedLastMatch == 1 ? 2 :1;
-			} else {
-				$sideStarted = rand(1, 2);
+			if ($playerStartedLastMatch) {
+				$sideStarted = $playerStartedLastMatch == $player1 ? 2 : 1;
 			}
 		}
 
