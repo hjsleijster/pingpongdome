@@ -113,13 +113,13 @@ class Pingpongdome
 				FROM matches m
 				LEFT JOIN (
 					SELECT
-						match_id
-						, SUM(won_by_side = 1) AS side1_games
-						, SUM(won_by_side = 2) AS side2_games
+					match_id
+					, SUM(won_by_side = 1) AS side1_games
+					, SUM(won_by_side = 2) AS side2_games
 					FROM games
 					WHERE won_by_side IS NOT NULL
 					GROUP BY match_id
-				) AS g ON m.id = g.match_id
+					) AS g ON m.id = g.match_id
 				WHERE deleted_at IS NULL AND m.id = " . $match_id . "
 				GROUP BY m.id"
 			),
