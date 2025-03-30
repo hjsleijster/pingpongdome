@@ -114,7 +114,8 @@ function updateMatch(data) {
 
 function submitForm(form) {
 	let formdata = $(form).serializeArray();
-	let endpoint = formdata.match ? 'updateMatch' : 'newMatch';
+	let form_match = $('[name=match]', form).val();
+	let endpoint = form_match > 0 ? 'updateMatch' : 'newMatch';
 	$.post(moduleUrl + endpoint, formdata, function(data) {
 		if (data.error) {
 			$('.error', form).remove();
@@ -122,7 +123,7 @@ function submitForm(form) {
 			return;
 		}
 
-		if (!formdata.match) {
+		if (form_match != data.match.id) {
 			window.history.pushState('', '', '?match=' + data.match.id);
 		}
 
