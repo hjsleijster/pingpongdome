@@ -128,7 +128,7 @@
 		display: none;
 	}
 
-	#enable-fullscreen {
+	#toggle-fullscreen {
 		@media only screen and (min: 1280px) {
 			display: none;
 		}

@@ -80,7 +80,7 @@ class Pingpongdome
 		$r .= $this->renderSide(2);
 		$r .= '<span id="score-undo" class="round-button match-action">↶</span>';
 		$r .= '<span id="switch-sides" class="round-button match-action">⇄</span>';
-		$r .= '<span id="enable-fullscreen" class="round-button">⛶</span>';
+		$r .= '<span id="toggle-fullscreen" class="round-button">⛶</span>';
 		$r .= '<span id="toggle-options" class="round-button">≡</span>';
 		$r .= '</div>';
 

@@ -2,6 +2,7 @@
 var moduleUrl = '/pingpongdome/';
 var matchId;
 var matchData;
+var fullscreen = false;
 var fireworksInterval;
 
 $(function() {
@@ -19,9 +20,14 @@ $(function() {
 		$('.side1').toggleClass('switched');
 	});
 
-	$('#enable-fullscreen').on('click', function() {
-		document.documentElement.webkitRequestFullscreen();
-		$(this).hide();
+	$('#toggle-fullscreen').on('click', function() {
+		if (!fullscreen) {
+			document.documentElement.webkitRequestFullscreen();
+			fullscreen = true;
+		} else if (document.webkitExitFullscreen) {
+			document.webkitExitFullscreen();
+			fullscreen = false;
+	    }
 	});
 
 	$('#toggle-options, .options-modal').on('click', function(event) {
