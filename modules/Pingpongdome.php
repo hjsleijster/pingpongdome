@@ -87,7 +87,7 @@ class Pingpongdome
 		$r .= '<span id="switch-sides" class="round-button match-action"></span>';
 
 		$r .= '<div>';
-		$r .= '<span id="manage-users" class="round-button non-match-action"></span>';
+		#$r .= '<span id="manage-users" class="round-button non-match-action"></span>';
 		$r .= '<span id="toggle-fullscreen" class="round-button"></span>';
 		$r .= '<span id="toggle-options" class="round-button"></span>';
 		$r .= '</div>';
