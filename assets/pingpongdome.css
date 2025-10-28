@@ -175,7 +175,7 @@
 	}
 }
 
-.options-modal {
+.modal {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -190,7 +190,7 @@
 	}
 }
 
-.options {
+.modal-body {
 	position: absolute;
 	z-index: 1;
 	top: 10%;

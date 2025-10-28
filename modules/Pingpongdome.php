@@ -30,12 +30,12 @@ class Pingpongdome
 		$r = '';
 
 		$r .= $this->renderMatch();
-		$r .= $this->renderMenu();
+		$r .= $this->renderOptions();
 
 		return $r;
 	}
 
-	private function renderMenu() {
+	private function renderOptions() {
 		$selectName = function($side) {
 			$players = DB::rows("SELECT id, first_name FROM players WHERE deleted_at IS NULL ORDER BY first_name ASC");
 			$r = '<select name="player-side' . $side . '" required><option></option>';
@@ -47,8 +47,8 @@ class Pingpongdome
 		};
 
 		$r = '';
-		$r .= '<div class="options-modal">';
-		$r .= '<div class="options">';
+		$r .= '<div class="modal modal-options">';
+		$r .= '<div class="modal-body">';
 
 		$r .= '<form>';
 		$r .= '<input type="hidden" name="match" value="">';
@@ -65,6 +65,8 @@ class Pingpongdome
 		$r .= '<input type="submit" class="button edit-match" value="Wedstrijd aanpassen">';
 		$r .= '</form>';
 		$r .= '<a id="end-match" class="button">Wedstrijd beëindigen</a>';
+
+		$r .= '</div>';
 		$r .= '</div>';
 
 		$r .= '</div>';

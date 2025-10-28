@@ -30,7 +30,7 @@ $(function() {
 	    }
 	});
 
-	$('#toggle-options, .options-modal').on('click', function(event) {
+	$('#toggle-options, .modal-options').on('click', function(event) {
 		if (event.target == this) {
 			toggleOptions();
 		}
@@ -140,16 +140,16 @@ function submitForm(form) {
 		}
 
 		updateMatch(data);
-		$('.options-modal').removeClass('open');
 		$('#score-undo').addClass('show');
+		$('.modal-options').removeClass('open');
 		$('.error', form).remove();
 	}, 'json');
 }
 
 function toggleOptions() {
-	$('.options-modal').toggleClass('open');
+	$('.modal-options').toggleClass('open');
 
-	if ($('.options-modal').hasClass('open')) {
+	if ($('.modal-options').hasClass('open')) {
 		// ongoing match
 		if (matchId && !matchData.match.won_by_side) {
 			$('input[type=hidden][name=match]').val(matchId);
