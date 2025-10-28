@@ -78,10 +78,21 @@ class Pingpongdome
 		$r .= '<div class="match" data-match="' . $this->match_id . '">';
 		$r .= $this->renderSide(1);
 		$r .= $this->renderSide(2);
-		$r .= '<span id="score-undo" class="round-button match-action">↶</span>';
-		$r .= '<span id="switch-sides" class="round-button match-action">⇄</span>';
-		$r .= '<span id="toggle-fullscreen" class="round-button">⛶</span>';
-		$r .= '<span id="toggle-options" class="round-button">≡</span>';
+		$r .= '<div id="buttons">';
+
+		$r .= '<div>';
+		$r .= '<span id="score-undo" class="round-button"></span>';
+		$r .= '</div>';
+
+		$r .= '<span id="switch-sides" class="round-button match-action"></span>';
+
+		$r .= '<div>';
+		$r .= '<span id="manage-users" class="round-button non-match-action"></span>';
+		$r .= '<span id="toggle-fullscreen" class="round-button"></span>';
+		$r .= '<span id="toggle-options" class="round-button"></span>';
+		$r .= '</div>';
+
+		$r .= '</div>';
 		$r .= '</div>';
 
 		return $r;

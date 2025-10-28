@@ -89,9 +89,14 @@ function updateMatch(data) {
 	if (data === undefined || !Object.keys(data).length || !Object.keys(data.sides).length) {
 		window.history.pushState('', '', '?');
 		$('.match-action').toggle(false);
+		$('.non-match-action').toggle(true);
+		$('#score-undo').removeClass('show')
 		toggleOptions();
 		return;
 	}
+
+	$('#score-undo').addClass('show');
+
 
 	if (data.match.won_by_side) {
 		fireworks(data.match.won_by_side);
@@ -113,7 +118,8 @@ function updateMatch(data) {
 	$('.side' + data.match.serving).addClass('serving');
 
 	// game is over
-	$('.match-action:not(#score-undo)').toggle(!data.match.finished_at);
+	$('.match-action').toggle(!data.match.finished_at);
+	$('.non-match-action').toggle(!!data.match.finished_at);
 	// set form data
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
 }
@@ -135,6 +141,7 @@ function submitForm(form) {
 
 		updateMatch(data);
 		$('.options-modal').removeClass('open');
+		$('#score-undo').addClass('show');
 		$('.error', form).remove();
 	}, 'json');
 }

@@ -103,28 +103,64 @@
 		box-shadow: 2px 2px 8px #333;
 		cursor: pointer;
 
-		&#score-undo {
-			left: 30px;
-		}
-
 		&#switch-sides {
+			position: absolute;
 			left: 50%;
 			margin-left: -30px;
 			font-size: 36px;
 			line-height: 64px;
 		}
+	}
 
-		&#toggle-options {
-			right: 30px;
+	#buttons {
+		position: absolute;
+		bottom: 30px;
+		left: 30px;
+		height: 60px;
+		width: calc(100% - 60px);
+
+		> div:first-child {
+			position: absolute;
+			left: 0;
+		}
+		> div ~ div {
+			position: absolute;
+			right: 0;
+
+			.round-button {
+				margin-left: 15px;
+			}
+		}
+
+		.round-button {
+			background-size: 60%;
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+
+		#score-undo {
+			display: none;
+			background-image: url('/assets/icons/undo.svg');
+
+			&.show {
+				display: inline-block;
+			}
+		}
+		#switch-sides {
+			background-image: url('/assets/icons/switch-sides.svg');
+		}
+		#manage-users {
+			background-image: url('/assets/icons/users.svg');
+		}
+		#toggle-fullscreen {
+			background-image: url('/assets/icons/fullscreen.svg');
+		}
+		#toggle-options {
+			background-image: url('/assets/icons/options.svg');
 		}
 	}
 
-	> .round-button {
-		position: absolute;
-		bottom: 30px;
-	}
-
-	.match-action:not(#score-undo) {
+	.match-action {
 		display: none;
 	}
 
