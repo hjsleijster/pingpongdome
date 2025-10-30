@@ -29,8 +29,9 @@ class Pingpongdome
 		Literiser::addHeadTag('<script src="/assets/jquery.touch.min.js"></script>');
 		$r = '';
 
-		$r .= $this->renderMatch();
 		$r .= $this->renderOptions();
+		$r .= $this->renderUsers();
+		$r .= $this->renderMatch();
 
 		return $r;
 	}
@@ -75,6 +76,21 @@ class Pingpongdome
 		return $r;
 	}
 
+	private function renderUsers() {
+		$r = '';
+		$r .= '<div class="modal modal-users">';
+		$r .= '<div class="modal-body">';
+
+		$r .= '<form>';
+		$r .= 'users...';
+		$r .= '</form>';
+
+		$r .= '</div>';
+		$r .= '</div>';
+
+		return $r;
+	}
+
 	private function renderMatch() {
 		$r = '';
 		$r .= '<div class="match" data-match="' . $this->match_id . '">';
@@ -89,7 +105,7 @@ class Pingpongdome
 		$r .= '<span id="switch-sides" class="round-button match-action"></span>';
 
 		$r .= '<div>';
-		#$r .= '<span id="manage-users" class="round-button non-match-action"></span>';
+		$r .= '<span id="manage-users" class="round-button non-match-action"></span>';
 		$r .= '<span id="toggle-fullscreen" class="round-button"></span>';
 		$r .= '<span id="toggle-options" class="round-button"></span>';
 		$r .= '</div>';

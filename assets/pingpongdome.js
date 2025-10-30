@@ -36,6 +36,12 @@ $(function() {
 		}
 	});
 
+	$('#manage-users, .modal-users').on('click', function(event) {
+		if (event.target == this) {
+			toggleUsers();
+		}
+	});
+
 	$('form').on('submit', function(e) {
 		e.preventDefault();
 		submitForm(this);
@@ -166,6 +172,10 @@ function toggleOptions() {
 			$('#end-match').hide();
 		}
 	}
+}
+
+function toggleUsers() {
+	$('.modal-users').toggleClass('open');
 }
 
 function fireworks(side) {
