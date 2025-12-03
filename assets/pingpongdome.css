@@ -234,7 +234,42 @@
 		}
 	}
 
+}
+
+.modal-options {
 	#end-match {
 		margin-top: 60px;
+	}
+}
+
+.modal-users {
+	text-align: left;
+
+	ul {
+		margin: 20px 0;
+		max-height: 80px;
+		overflow-y: scroll;
+
+		li {
+			list-style-type: none;
+		}
+	}
+
+	.user-names {
+		margin: 20px 0;
+
+		input {
+			width: 40%;
+
+		}
+
+		input[type=hidden] + span {
+			margin-left: 15px;
+			visibility: hidden;
+			filter: grayscale(1);
+		}
+		input[type=hidden][value]:not([value='']) + span {
+			visibility: visible;
+		}
 	}
 }

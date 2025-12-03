@@ -82,7 +82,24 @@ class Pingpongdome
 		$r .= '<div class="modal-body">';
 
 		$r .= '<form>';
-		$r .= 'users...';
+		$r .= '<ul>';
+		$users = DB::rows("SELECT * FROM players WHERE deleted_at IS NULL ORDER BY first_name");
+		foreach ($users as $user) {
+			$r .= '<li data-userid="' . $user['id'] . '">';
+			$r .= '<span>' . $user['first_name']. '</span>';
+			$r .= ' <span>' . $user['last_name']. '</span>';
+			$r .= '</li>';
+		}
+		$r .= '</ul>';
+
+		$r .= '<div class="user-names">';
+		$r .= '<input type="text" name="first_name" placeholder="Voornaam"> ';
+		$r .= '<input type="text" name="last_name" placeholder="Achternaam">';
+		$r .= '<input type="hidden" name="userid">';
+		$r .= '<span class="delete-user">🗑</span>';
+		$r .= '</div>';
+
+		$r .= '<input type="submit" value="Opslaan">';
 		$r .= '</form>';
 
 		$r .= '</div>';
@@ -328,5 +345,43 @@ class Pingpongdome
 
 		$this->recalculateMatch();
 		return $this->xhr_getMatch();
+	}
+
+	private function xhr_newUser() {
+		if (!$this->request['first_name'] || !$this->request['last_name']) {
+			return ['error' => 'Vul voornaam en achternaam in'];
+		}
+
+		$id = DB::q("INSERT INTO players (first_name, last_name) VALUES (
+			'" . addslashes($this->request['first_name']) . "'
+			, '" . addslashes($this->request['last_name']) . "'
+		)");
+
+		return ['id' => $id];
+	}
+
+	private function xhr_updateUser() {
+		if (!$this->request['first_name'] || !$this->request['last_name'] || !$this->request['userid']) {
+			return ['error' => 'Vul voornaam en achternaam in'];
+		}
+
+		DB::q("UPDATE players
+			SET first_name = '" . addslashes($this->request['first_name']) . "'
+			, last_name = '" . addslashes($this->request['last_name']) . "'
+			WHERE id = " . (int) $this->request['userid']
+		);
+
+		return ['success' => true];
+	}
+
+	private function xhr_deleteUser() {
+		$userid = (int) $this->uri[2];
+		if (!$userid) {
+			return ['error' => 'Incompleet'];
+		}
+
+		DB::q("UPDATE players SET deleted_at = NOW() WHERE id = " . $userid);
+
+		return ['success' => true];
 	}
 }

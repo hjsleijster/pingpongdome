@@ -44,7 +44,11 @@ $(function() {
 
 	$('form').on('submit', function(e) {
 		e.preventDefault();
-		submitForm(this);
+		if ($(this).parents('.modal').hasClass('modal-options')) {
+			submitOptionsForm(this);
+		} else if ($(this).parents('.modal').hasClass('modal-users')) {
+			submitUsersForm(this);
+		}
 	})
 
 	$('#end-match').on('click', function() {
@@ -53,6 +57,16 @@ $(function() {
 				window.location.href = '?';
 			});
 		}
+	});
+
+	$('li', '.modal-users').on('click', function() {
+		$('.modal-users input[name=first_name]').val($('span:first-child', this).text());
+		$('.modal-users input[name=last_name]').val($('span:last-child', this).text());
+		$('.modal-users input[name=userid]').val($(this).data('userid'));
+	});
+
+	$('.delete-user', '.modal-users').on('click', function() {
+		deleteUser(this);
 	});
 
 	if (matchId > 0) {
@@ -130,13 +144,13 @@ function updateMatch(data) {
 	$('[name=best_out_of][value=' + data.match.best_out_of + ']').prop('checked', true);
 }
 
-function submitForm(form) {
-	let formdata = $(form).serializeArray();
+function submitOptionsForm(form) {
 	let form_match = $('[name=match]', form).val();
 	let endpoint = form_match > 0 ? 'updateMatch' : 'newMatch';
-	$.post(moduleUrl + endpoint, formdata, function(data) {
+
+	$.post(moduleUrl + endpoint, $(form).serializeArray(), function(data) {
+		$('.error', form).remove();
 		if (data.error) {
-			$('.error', form).remove();
 			$(form).prepend('<div class="error">' + data.error + '</div>');
 			return;
 		}
@@ -148,7 +162,6 @@ function submitForm(form) {
 		updateMatch(data);
 		$('#score-undo').addClass('show');
 		$('.modal-options').removeClass('open');
-		$('.error', form).remove();
 	}, 'json');
 }
 
@@ -176,6 +189,43 @@ function toggleOptions() {
 
 function toggleUsers() {
 	$('.modal-users').toggleClass('open');
+}
+
+function submitUsersForm(form) {
+	let formdata = new FormData(form);
+	let userid = $('[name=userid]', form).val();
+	let endpoint = userid > 0 ? 'updateUser' : 'newUser';
+
+	$.post(moduleUrl + endpoint, $(form).serializeArray(), function(data) {
+		$('.error', form).remove();
+		if (data.error) {
+			$(form).prepend('<div class="error">' + data.error + '</div>');
+			return;
+		}
+
+		if (userid) {
+			$('[data-userid=' + userid + '] span:first-child').text(formdata.get('first_name'));
+			$('[data-userid=' + userid + '] span:last-child').text(formdata.get('last_name'));
+		} else {
+			let li = '<li data-userid="' + data.id + '">';
+			li += '<span>' + formdata.get('first_name') + '</span> ';
+			li += '<span>' + formdata.get('last_name') + '</span> ';
+			li += '</li>';
+			$('ul', form).prepend(li);
+		}
+
+		$(form)[0].reset();
+
+	}, 'json');
+}
+function deleteUser(trash) {
+	let userid = $(trash).prev().val();
+	let endpoint = 'deleteUser/' + userid;
+
+	$.post(moduleUrl + endpoint, function(data) {
+		$('[data-userid=' + userid + ']').slideUp();
+		$('.modal-users form')[0].reset();
+	}, 'json');
 }
 
 function fireworks(side) {
