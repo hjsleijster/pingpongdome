@@ -59,13 +59,13 @@ $(function() {
 		}
 	});
 
-	$('li', '.modal-users').on('click', function() {
+	$('.modal-users').on('click', 'li', function() {
 		$('.modal-users input[name=first_name]').val($('span:first-child', this).text());
 		$('.modal-users input[name=last_name]').val($('span:last-child', this).text());
 		$('.modal-users input[name=userid]').val($(this).data('userid'));
 	});
 
-	$('.delete-user', '.modal-users').on('click', function() {
+	$('.modal-users').on('click', '.delete-user', function() {
 		deleteUser(this);
 	});
 
@@ -207,11 +207,11 @@ function submitUsersForm(form) {
 			$('[data-userid=' + userid + '] span:first-child').text(formdata.get('first_name'));
 			$('[data-userid=' + userid + '] span:last-child').text(formdata.get('last_name'));
 		} else {
-			let li = '<li data-userid="' + data.id + '">';
+			let li = '<li>';
 			li += '<span>' + formdata.get('first_name') + '</span> ';
 			li += '<span>' + formdata.get('last_name') + '</span> ';
 			li += '</li>';
-			$('ul', form).prepend(li);
+			$(li).prependTo('ul').data('userid', data.id);
 		}
 
 		$(form)[0].reset();
